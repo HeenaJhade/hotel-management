@@ -1,9 +1,9 @@
-const { validationResult } = require('express-validator');
-const User = require('../models/User');
-const { hashPassword, verifyPassword, createAccessToken } = require('../middleware/auth.middleware'); // or move to service
-const { sendOtpEmail, generateOtp, getOtpExpiry } = require('../services/email.service');
+import { validationResult } from 'express-validator';
+import User  from '../models/User.js';
+import { hashPassword, verifyPassword, createAccessToken } from '../middleware/auth.middleware.js'; 
+import { sendOtpEmail, generateOtp, getOtpExpiry }  from '../services/email.service.js';
 
-const signup = async (req, res) => {
+export const signup = async (req, res) => {
   const errors = validationResult(req);
   console.log(errors);
   if (!errors.isEmpty()) {
@@ -45,7 +45,7 @@ const signup = async (req, res) => {
   }
 };
 
-const verifyOtp = async (req, res) => {
+export  const verifyOtp = async (req, res) => {
   const { email, otp } = req.body;
 
   try {
@@ -79,7 +79,7 @@ const verifyOtp = async (req, res) => {
   }
 };
 
-const resendOtp = async (req, res) => {
+export const resendOtp = async (req, res) => {
   const { email } = req.body;
 
   try {
@@ -103,7 +103,7 @@ const resendOtp = async (req, res) => {
   }
 };
 
-const login = async (req, res) => {
+export  const login = async (req, res) => {
   const { email, password } = req.body;
 
   try {
@@ -142,7 +142,7 @@ const login = async (req, res) => {
   }
 };
 
-const getCurrentUser = async (req, res) => {
+export  const getCurrentUser = async (req, res) => {
   try {
     const user = await User.findOne({ email: req.user.email })
       .select('-passwordHash -otp -otpExpiry');
@@ -163,7 +163,7 @@ const getCurrentUser = async (req, res) => {
   }
 };
 
-const resetPassword = async (req, res) => {
+export const resetPassword = async (req, res) => {
   const { email, otp, new_password } = req.body;
 
   if (!email || !otp || !new_password) {
@@ -206,7 +206,7 @@ const resetPassword = async (req, res) => {
     return res.status(500).json({ detail: 'Failed to reset password' });
   }
 };
-const forgotPassword = async (req, res) => {
+export const forgotPassword = async (req, res) => {
   const { email } = req.body;
 
   if (!email) {
@@ -236,17 +236,4 @@ const forgotPassword = async (req, res) => {
     console.error('Forgot password error:', error);
     return res.status(500).json({ detail: 'Failed to process request' });
   }
-};
-
-
-
-
-module.exports = {
-  signup,
-  verifyOtp,
-  resendOtp,
-  login,
-  resetPassword,
-  forgotPassword,
-  getCurrentUser
 };

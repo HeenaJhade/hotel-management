@@ -1,6 +1,5 @@
-const express = require("express");
+import express from "express";
 const router = express.Router();
-const imagekit = require("../config/imagekit");
 
 router.post("/upload", async (req, res) => {
   try {
@@ -33,4 +32,4 @@ router.post("/upload", async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;

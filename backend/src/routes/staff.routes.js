@@ -1,13 +1,11 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-
-const {
+import {
   deleteUser,
   toggleUserBlock,
   getAllGuest,
-} = require('../controllers/staff.controller');
-
-const { authMiddleware, requireStaffOrAdmin } = require('../middleware/auth.middleware');
+} from '../controllers/staff.controller.js';
+import { authMiddleware, requireStaffOrAdmin } from '../middleware/auth.middleware.js';
 
 // Get all guests
 router.get(
@@ -34,4 +32,4 @@ router.delete(
 );
 
 
-module.exports = router;
+export default router;

@@ -1,9 +1,8 @@
-const express = require('express');
-const router = express.Router();
-const { getDashboardStats } = require('../controllers/report.controller');
-
-const { authMiddleware, requireStaffOrAdmin } = require('../middleware/auth.middleware');
+import express from 'express';
+import { getDashboardStats } from '../controllers/report.controller.js';
+const router = express.Router(); 
+import { authMiddleware, requireStaffOrAdmin } from '../middleware/auth.middleware.js';
 
 router.get('/dashboard', authMiddleware, requireStaffOrAdmin, getDashboardStats);
 
-module.exports = router;
+export default router;

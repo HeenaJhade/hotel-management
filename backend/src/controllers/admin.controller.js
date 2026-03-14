@@ -1,9 +1,8 @@
-const User = require('../models/User');
-const { hashPassword, createAccessToken } = require('../middleware/auth.middleware'); // or from auth service
-const { sendOtpEmail, generateOtp, getOtpExpiry } = require('../services/email.service');
-const { validationResult } = require('express-validator');
+import User from '../models/User.js';
+import{ hashPassword} from '../middleware/auth.middleware.js'; // or from auth service
+import { validationResult } from 'express-validator';
 
-const createStaff = async (req, res) => {
+export const createStaff = async (req, res) => {
   const errors = validationResult(req);
   const { name, email, password, phone_number, role } = req.body;
 
@@ -41,7 +40,7 @@ const createStaff = async (req, res) => {
   }
 };
 
-const getAllUsers = async (req, res) => {
+export  const getAllUsers = async (req, res) => {
   try {
     let { page = 1, limit = 10, search = '', role } = req.query;
 
@@ -93,7 +92,7 @@ const getAllUsers = async (req, res) => {
 };
 
 
-const deleteUser = async (req, res) => {
+export  const deleteUser = async (req, res) => {
   const { userEmail } = req.params;
 
   try {
@@ -113,7 +112,7 @@ const deleteUser = async (req, res) => {
   }
 };
 // controllers/admin.controller.js
-const toggleUserBlock = async (req, res) => {
+export  const toggleUserBlock = async (req, res) => {
   const { userEmail } = req.params;
   const { isBlocked } = req.body;
 
@@ -159,10 +158,4 @@ const toggleUserBlock = async (req, res) => {
     console.error('[toggleUserBlock]', err);
     return res.status(500).json({ success: false, message: 'Failed to update status' });
   }
-};
-module.exports = {
-  createStaff,
-  getAllUsers,
-  deleteUser,
-  toggleUserBlock
 };

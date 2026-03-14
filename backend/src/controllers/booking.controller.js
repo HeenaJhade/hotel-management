@@ -1,10 +1,98 @@
-const Booking = require('../models/Booking');
-const Room = require('../models/Room');
-const Notification = require('../models/Notification');
-const { getUserFromToken } = require('../utils/helpers');
-const { sendBookingConfirmationEmail,sendBookingCancellationEmail } = require('../services/email.service');
+import Booking from '../models/Booking.js';
+import Room from'../models/Room.js';
+import Notification from '../models/Notification.js';
+import { getUserFromToken } from'../utils/helpers.js';
+import { sendBookingConfirmationEmail,sendBookingCancellationEmail } from '../services/email.service.js';
+import Stripe from "stripe";
 
-const createBooking = async (req, res) => {
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+
+export const createBookingAfterPayment = async (req, res) => {
+  try {
+
+    const {
+      paymentIntentId,
+      userId,
+      userEmail,
+      userName,
+      roomId,
+      roomNumber,
+      roomType,
+      checkIn,
+      checkOut,
+      guests,
+      totalAmount
+    } = req.body;
+
+    // ⭐ VERIFY PAYMENT WITH STRIPE
+    const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
+
+    if (paymentIntent.status !== "succeeded") {
+      return res.status(400).json({ message: "Payment not verified" });
+    }
+
+    // ⭐ Prevent duplicate booking
+    const existingBooking = await Booking.findOne({ paymentIntentId });
+
+    if (existingBooking) {
+      return res.json({
+        success: true,
+        booking: existingBooking
+      });
+    }
+
+    const checkInDate = new Date(checkIn);
+    const checkOutDate = new Date(checkOut);
+
+    const nights = Math.ceil(
+      (checkOutDate - checkInDate) / (1000 * 60 * 60 * 24)
+    );
+
+    const bookingId =
+      `BK${Date.now().toString().slice(-8)}${Math.floor(Math.random() * 1000)}`;
+
+    const booking = new Booking({
+      bookingId,
+      userId,
+      userEmail,
+      userName,
+      roomId,
+      roomNumber,
+      roomType,
+      checkIn: checkInDate,
+      checkOut: checkOutDate,
+      guests,
+      nights,
+      totalAmount,
+      status: "confirmed",
+      paymentStatus: "paid",
+      paymentIntentId
+    });
+
+    await booking.save();
+
+    const notification = new Notification({
+      id: `NT${Date.now()}`,
+      userId,
+      message: `Booking confirmed for ${roomType} - Room ${roomNumber}`,
+      type: "booking",
+      isRead: false
+    });
+
+    await notification.save();
+
+    res.json({
+      success: true,
+      booking
+    });
+
+  } catch (error) {
+    console.error("Booking creation error:", error);
+    res.status(500).json({ message: "Failed to create booking" });
+  }
+};
+export const createBooking = async (req, res) => {
   const { roomId, checkIn, checkOut, guests, specialRequests = "" } = req.body;
 
   try {
@@ -125,9 +213,7 @@ console.log(`Emitted newNotification to user_${user.id}`);
   }
 };
 
-// src/controllers/booking.controller.js
-
-const getBookings = async (req, res) => {
+export const getBookings = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
@@ -167,7 +253,7 @@ const getBookings = async (req, res) => {
   }
 };
 
-const getUserBookings = async (req, res) => {
+export const getUserBookings = async (req, res) => {
   try {
     const user = await getUserFromToken(req);
     console.log(user);
@@ -184,7 +270,7 @@ const getUserBookings = async (req, res) => {
     res.status(500).json({ detail: "Server error" });
   }
 };
-const getBookingById = async (req, res) => {
+export const getBookingById = async (req, res) => {
   try {
     const booking = await Booking.findOne({ bookingId: req.params.bookingId });
     if (!booking) return res.status(404).json({ detail: 'Booking not found' });
@@ -200,7 +286,7 @@ const getBookingById = async (req, res) => {
   }
 };
 
-const checkIn = async (req, res) => {
+export const checkIn = async (req, res) => {
   const bookingId = req.params.bookingId;
 
   try {
@@ -252,7 +338,7 @@ const checkIn = async (req, res) => {
   }
 };
 
-const checkOut = async (req, res) => {
+export const checkOut = async (req, res) => {
   const bookingId = req.params.bookingId;
 
   try {
@@ -305,7 +391,7 @@ const checkOut = async (req, res) => {
   }
 };
 
-const getDashboardStats = async (req, res) => {
+export const getDashboardStats = async (req, res) => {
   try {
     const now = new Date();
 
@@ -388,7 +474,7 @@ console.log("Tomorrow UTC:", tomorrowUTC);
   }
 };
 
-const cancelBooking = async (req, res) => {
+export const cancelBooking = async (req, res) => {
   try {
     const booking = await Booking.findOne({ bookingId: req.params.bookingId });
     if (!booking) {
@@ -467,16 +553,4 @@ const cancelBooking = async (req, res) => {
     console.error('Cancel booking error:', error);
     res.status(500).json({ detail: 'Failed to cancel booking' });
   }
-};
-
-
-module.exports = {
-  getUserBookings,
-  getBookings,
-  getBookingById,
-  getDashboardStats,
-  checkIn,
-  checkOut,
-  createBooking,
-  cancelBooking
 };

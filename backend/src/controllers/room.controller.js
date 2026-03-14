@@ -1,11 +1,11 @@
-const Room = require("../models/Room");
-const Booking = require("../models/Booking");
+import Room from "../models/Room.js";
+import Booking from "../models/Booking.js";
 
 /* ===============================
    CREATE ROOM
 ================================ */
 
-const createRoom = async (req, res) => {
+export const createRoom = async (req, res) => {
   try {
     const {
       roomNumber,
@@ -53,7 +53,7 @@ const createRoom = async (req, res) => {
    UPDATE ROOM
 ================================ */
 
-const updateRoom = async (req, res) => {
+export const updateRoom = async (req, res) => {
   try {
     const allowedFields = [
       "roomNumber",
@@ -111,7 +111,7 @@ const updateRoom = async (req, res) => {
    GET ALL ROOMS
 ================================ */
 
-const getAvailableRooms = async (req, res) => {
+export const getAvailableRooms = async (req, res) => {
   try {
     const { roomType, checkIn, checkOut } = req.query;
 
@@ -168,7 +168,7 @@ const getAvailableRooms = async (req, res) => {
    GET ROOM BY ID
 ================================ */
 
-const getRoomById = async (req, res) => {
+export const getRoomById = async (req, res) => {
   try {
     const room = await Room.findById(req.params.roomId);
     if (!room) {
@@ -186,7 +186,7 @@ const getRoomById = async (req, res) => {
    DELETE ROOM
 ================================ */
 
-const deleteRoom = async (req, res) => {
+export const deleteRoom = async (req, res) => {
   try {
     const room = await Room.findByIdAndDelete(req.params.roomId);
     if (!room) {
@@ -202,7 +202,7 @@ const deleteRoom = async (req, res) => {
 
 
 
-const updateRoomStatus = async (req, res) => {
+export const updateRoomStatus = async (req, res) => {
   const { roomId } = req.params;
   const { status } = req.body;
 
@@ -245,7 +245,7 @@ const updateRoomStatus = async (req, res) => {
   }
 };
 
-const getAllRooms = async (req, res) => {
+export const getAllRooms = async (req, res) => {
   try {
     let { 
       page = 1, 
@@ -299,7 +299,7 @@ const getAllRooms = async (req, res) => {
   }
 };
 
-const isRoomAvailable = async (roomId, checkIn, checkOut) => {
+export const isRoomAvailable = async (roomId, checkIn, checkOut) => {
   const checkInDate = new Date(checkIn);
   const checkOutDate = new Date(checkOut);
 
@@ -322,10 +322,7 @@ const isRoomAvailable = async (roomId, checkIn, checkOut) => {
   return !overlappingBooking; // true if room is available
 };
 
-/**
- * Express controller for GET /rooms/:roomId/check-availability
- */
-const checkAvailability = async (req, res) => {
+export const checkAvailability = async (req, res) => {
   const { roomId } = req.params;
   const { checkIn, checkOut } = req.query;
 
@@ -340,18 +337,4 @@ const checkAvailability = async (req, res) => {
     console.error("Room availability check error:", err);
     res.status(500).json({ detail: "Failed to check room availability" });
   }
-};
-
-
-
-module.exports = {
-  createRoom,
-  updateRoom,
-  getAllRooms,
-  getAvailableRooms,
-  updateRoomStatus,
-  getRoomById,
-  deleteRoom,
-  checkAvailability,
-  isRoomAvailable,
 };

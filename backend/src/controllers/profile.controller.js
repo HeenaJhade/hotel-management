@@ -1,6 +1,6 @@
-const User = require('../models/User');
+import User from '../models/User.js';
 
-const updateProfile = async (req, res) => {
+export const updateProfile = async (req, res) => {
   try {
     const allowedFields = ['name', 'phone'];
     const updateData = {};
@@ -25,4 +25,3 @@ const updateProfile = async (req, res) => {
   }
 };
 
-module.exports = { updateProfile };

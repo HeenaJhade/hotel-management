@@ -1,6 +1,6 @@
-const User = require('../models/User');
+import User from '../models/User.js';
 
-const getUserFromToken = async (req) => {
+export const getUserFromToken = async (req) => {
   console.log("und",req);
   const user = await User.findOne({ email: req.user.email })
     .select('-passwordHash -otp -otpExpiry');
@@ -8,5 +8,3 @@ const getUserFromToken = async (req) => {
   console.log(user);
   return user;
 };
-
-module.exports = { getUserFromToken };

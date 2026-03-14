@@ -1,7 +1,7 @@
-const Notification = require('../models/Notification');
-const { getUserFromToken } = require('../utils/helpers');
+import Notification from '../models/Notification.js';
+import { getUserFromToken } from '../utils/helpers.js';
 
-const getNotifications = async (req, res) => {
+export const getNotifications = async (req, res) => {
   try {
     const user = await getUserFromToken(req);
     if (!user) {
@@ -41,7 +41,7 @@ const getNotifications = async (req, res) => {
   }
 };
 
-const markNotificationRead = async (req, res) => {
+export const markNotificationRead = async (req, res) => {
   try {
     const user = await getUserFromToken(req);
     if (!user) return res.status(401).json({ detail: 'Unauthorized' });
@@ -88,7 +88,7 @@ const markNotificationRead = async (req, res) => {
   }
 };
 
-const deleteNotification = async (req, res) => {
+export const deleteNotification = async (req, res) => {
   try {
     const user = await getUserFromToken(req);
     if (!user) {
@@ -113,8 +113,3 @@ const deleteNotification = async (req, res) => {
   }
 };
 
-module.exports = {
-  getNotifications,
-  markNotificationRead,
-  deleteNotification,
-};

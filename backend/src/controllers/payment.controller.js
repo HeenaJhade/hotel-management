@@ -1,10 +1,9 @@
-const Stripe = require("stripe");
+import Stripe from "stripe";
+import Room from "../models/Room.js";
+import { getUserFromToken } from "../utils/helpers.js";
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
-const Room = require("../models/Room");
-const { getUserFromToken } = require("../utils/helpers");
-
-const createPaymentIntent = async (req, res) => {
+export const createPaymentIntent = async (req, res) => {
   try {
     if (!req.body.metadata) {
       return res.status(400).json({ detail: "Missing metadata" });
@@ -73,5 +72,3 @@ const createPaymentIntent = async (req, res) => {
     res.status(500).json({ detail: "Payment intent failed" });
   }
 };
-
-module.exports = { createPaymentIntent };

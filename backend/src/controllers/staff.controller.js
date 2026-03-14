@@ -1,6 +1,6 @@
-const User = require('../models/User');
+import User from '../models/User.js';
 
-const getAllGuest = async (req, res) => {
+export const getAllGuest = async (req, res) => {
   try {
     let { 
       page = 1, 
@@ -52,7 +52,7 @@ const getAllGuest = async (req, res) => {
     });
   }
 };
-const deleteUser = async (req, res) => {
+export const deleteUser = async (req, res) => {
   const { guestId } = req.params;
 
   try {
@@ -82,7 +82,7 @@ const deleteUser = async (req, res) => {
   }
 };
 // controllers/admin.controller.js
-const toggleUserBlock = async (req, res) => {
+export const toggleUserBlock = async (req, res) => {
   const { guestId } = req.params;
   const { isBlocked } = req.body;
 
@@ -132,11 +132,4 @@ const toggleUserBlock = async (req, res) => {
       message: 'Failed to update status'
     });
   }
-};
-
-module.exports = {
-  deleteUser,
-  getAllGuest,
-  toggleUserBlock,
-
 };

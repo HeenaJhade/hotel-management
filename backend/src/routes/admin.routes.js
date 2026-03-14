@@ -1,14 +1,13 @@
-const express = require('express');
-const router = express.Router();
-const {
+import express from 'express';
+import {
   createStaff,
   getAllUsers,
   deleteUser,
   toggleUserBlock,
-} = require('../controllers/admin.controller');
-
-const { authMiddleware, requireAdmin } = require('../middleware/auth.middleware');
-const { body } = require('express-validator');
+} from '../controllers/admin.controller.js';
+import { authMiddleware, requireAdmin } from '../middleware/auth.middleware.js';
+import { body } from 'express-validator';
+const router = express.Router();
 
 router.post(
   '/staff',
@@ -34,4 +33,4 @@ router.delete('/users/:userEmail', authMiddleware, requireAdmin, deleteUser);
 
 
 
-module.exports = router;
+export default router;

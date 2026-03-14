@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const bookingSchema = new mongoose.Schema({
   id: String,
@@ -24,5 +24,4 @@ const bookingSchema = new mongoose.Schema({
   cancelledBy: { type: String, enum: ['user', 'staff', 'admin'] },
   createdAt: { type: Date, default: Date.now }
 }, { collection: 'bookings' });
-
-module.exports = mongoose.model('Booking', bookingSchema);
+export default mongoose.model('Booking', bookingSchema);

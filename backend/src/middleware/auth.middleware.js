@@ -1,16 +1,16 @@
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
 
-const hashPassword = async (password) => {
+export const hashPassword = async (password) => {
   const salt = await bcrypt.genSalt(10);
   return bcrypt.hash(password, salt);
 };
 
-const verifyPassword = async (password, hashedPassword) => {
+export const verifyPassword = async (password, hashedPassword) => {
   return bcrypt.compare(password, hashedPassword);
 };
 
-const createAccessToken = (payload) => {
+export const createAccessToken = (payload) => {
   const expiresIn = parseInt(process.env.ACCESS_TOKEN_EXPIRE_MINUTES || '1440') * 60; // convert to seconds
   return jwt.sign(payload, process.env.JWT_SECRET_KEY, {
     expiresIn,
@@ -18,7 +18,7 @@ const createAccessToken = (payload) => {
   });
 };
 
-const verifyToken = (token) => {
+export const verifyToken = (token) => {
   try {
     return jwt.verify(token, process.env.JWT_SECRET_KEY);
   } catch (error) {
@@ -26,7 +26,7 @@ const verifyToken = (token) => {
   }
 };
 
-const authMiddleware = (req, res, next) => {
+export const authMiddleware = (req, res, next) => {
   const authHeader = req.headers.authorization;
   
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -44,26 +44,17 @@ const authMiddleware = (req, res, next) => {
   next();
 };
 
-const requireAdmin = (req, res, next) => {
+export const requireAdmin = (req, res, next) => {
   if (req.user.role !== 'admin') {
     return res.status(403).json({ detail: 'Admin access required' });
   }
   next();
 };
 
-const requireStaffOrAdmin = (req, res, next) => {
+export const requireStaffOrAdmin = (req, res, next) => {
   if (!['staff', 'admin'].includes(req.user.role)) {
     return res.status(403).json({ detail: 'Staff or Admin access required' });
   }
   next();
 };
 
-module.exports = {
-  hashPassword,
-  verifyPassword,
-  createAccessToken,
-  verifyToken,
-  authMiddleware,
-  requireAdmin,
-  requireStaffOrAdmin
-};

@@ -1,8 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Manrope:wght@400;500;600&family=JetBrains+Mono&display=swap');
-
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
 body {
     margin: 0;
@@ -44,12 +41,13 @@ code {
 
 @layer base {
     * {
-        @apply border-border;
+        @apply border-gray-200;
     }
+
     body {
         @apply bg-slate-50 text-slate-900;
     }
-    
+
     h1, h2, h3, h4, h5, h6 {
         font-family: 'Playfair Display', serif;
     }
@@ -85,18 +83,6 @@ code {
         border-top-color: inherit;
         border-bottom-color: inherit;
     }
-}
-@keyframes bellShake {
-  0% { transform: rotate(0); }
-  20% { transform: rotate(-15deg); }
-  40% { transform: rotate(10deg); }
-  60% { transform: rotate(-10deg); }
-  80% { transform: rotate(5deg); }
-  100% { transform: rotate(0); }
-}
-
-.animate-bell-shake {
-  animation: bellShake 0.6s ease-in-out;
 }
 
 @keyframes slideDown {

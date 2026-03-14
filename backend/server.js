@@ -1,29 +1,27 @@
-require('dotenv').config();
-const express = require('express');
-const cors = require('cors');
-const http = require('http');
-const { Server } = require('socket.io');
+import 'dotenv/config';
+import express from 'express';
+import cors from 'cors';
+import http from'http';
+import { Server }from 'socket.io';
+import {connectDB} from './src/config/db.js';
+import uploadRoutes from "./src/routes/upload.routes.js";
+import authRoutes from './src/routes/auth.routes.js';
+import adminRoutes from './src/routes/admin.routes.js';
+import staffRoutes from './src/routes/staff.routes.js';
+import roomRoutes from './src/routes/rooms.routes.js';
+import bookingRoutes from './src/routes/bookings.routes.js';
+import notificationRoutes from './src/routes/notifications.routes.js';
+import profileRoutes from './src/routes/profile.routes.js';
+import reportRoutes from './src/routes/reports.routes.js';
+import paymentRoutes from "./src/routes/payment.routes.js";
 
-const connectDB = require('./src/config/db');
-
-const uploadRoutes = require("./src/routes/upload.routes");
-const authRoutes        = require('./src/routes/auth.routes');
-const adminRoutes       = require('./src/routes/admin.routes');
-const staffRoutes       = require('./src/routes/staff.routes');
-const roomRoutes        = require('./src/routes/rooms.routes');
-const bookingRoutes     = require('./src/routes/bookings.routes');
-const notificationRoutes = require('./src/routes/notifications.routes');
-const profileRoutes     = require('./src/routes/profile.routes');
-const reportRoutes      = require('./src/routes/reports.routes');
-const paymentRoutes = require("./src/routes/payment.routes");
-const { stripeWebhook } = require("./src/controllers/stripe.webhook.controller");
 
 
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: process.env.CORS_ORIGIN || 'http://localhost:3000',
+    origin: process.env.CORS_ORIGIN || 'http://localhost:5173',
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     credentials: true,
   },
@@ -35,17 +33,10 @@ const PORT = process.env.PORT || 8001;
 // Middleware
 // ────────────────────────────────────────────────
 app.use(cors({
-  origin: process.env.NODE_ENV === 'production'
-    ? process.env.CORS_ORIGIN
-    : 'http://localhost:3000',
+  origin: process.env.FRONTEND_URL,
   credentials: true,
 }));
-// 1️⃣ Keep this first
-app.post(
-  "/api/webhook/stripe",
-  express.raw({ type: "application/json" }),
-  stripeWebhook
-);
+
 
 // 2️⃣ All other routes use normal body parsers
 app.use(express.json());

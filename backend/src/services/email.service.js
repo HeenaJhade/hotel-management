@@ -1,10 +1,9 @@
-const sgMail = require('@sendgrid/mail');
-const crypto = require('crypto');
+import sgMail from '@sendgrid/mail';
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 // Custom error for email failures
-class EmailDeliveryError extends Error {
+export class EmailDeliveryError extends Error {
   constructor(message) {
     super(message);
     this.name = 'EmailDeliveryError';
@@ -12,17 +11,17 @@ class EmailDeliveryError extends Error {
 }
 
 // Generate 6-digit OTP
-const generateOtp = () => Math.floor(100000 + Math.random() * 900000).toString();
+export const generateOtp = () => Math.floor(100000 + Math.random() * 900000).toString();
 
 // OTP expiry: 10 minutes from now
-const getOtpExpiry = () => {
+export const getOtpExpiry = () => {
   const expiry = new Date();
   expiry.setMinutes(expiry.getMinutes() + 10);
   return expiry;
 };
 
-// Generic email sender with better error handling
-const sendEmail = async (to, subject, htmlContent, textContent = '') => {
+// email sender with better error handling
+export  const sendEmail = async (to, subject, htmlContent, textContent = '') => {
   if (!process.env.SENDGRID_API_KEY || !process.env.SENDGRID_SENDER_EMAIL) {
     console.error('SendGrid configuration missing');
     throw new EmailDeliveryError('Email service not configured');
@@ -49,7 +48,7 @@ const sendEmail = async (to, subject, htmlContent, textContent = '') => {
 // ────────────────────────────────────────────────
 // OTP Verification Email (Signup / Forgot Password)
 // ────────────────────────────────────────────────
-const sendOtpEmail = async (recipientEmail, otp, name, purpose = 'verification') => {
+export const sendOtpEmail = async (recipientEmail, otp, name, purpose = 'verification') => {
   const subject = purpose === 'password reset'
     ? 'Reset Your Password - HM'
     : 'Verify Your Email - HM';
@@ -99,7 +98,7 @@ const sendOtpEmail = async (recipientEmail, otp, name, purpose = 'verification')
 // ────────────────────────────────────────────────
 // Booking Confirmation Email
 // ────────────────────────────────────────────────
-const sendBookingConfirmationEmail = async (recipientEmail, bookingDetails) => {
+export const sendBookingConfirmationEmail = async (recipientEmail, bookingDetails) => {
   const subject = 'Booking Confirmed - HM';
 
   const htmlContent = `
@@ -157,16 +156,16 @@ const sendBookingConfirmationEmail = async (recipientEmail, bookingDetails) => {
 };
 
 // ────────────────────────────────────────────────
-// Optional: Password Reset Email (ready to use)
+// Password Reset Email (ready to use)
 // ────────────────────────────────────────────────
-const sendPasswordResetEmail = async (recipientEmail, otp, name) => {
+export const sendPasswordResetEmail = async (recipientEmail, otp, name) => {
   return sendOtpEmail(recipientEmail, otp, name, 'password reset');
 };
 
 // ────────────────────────────────────────────────
-// Optional: Booking Cancellation Email
+// Booking Cancellation Email
 // ────────────────────────────────────────────────
-const sendBookingCancellationEmail = async (recipientEmail, bookingDetails) => {
+export const sendBookingCancellationEmail = async (recipientEmail, bookingDetails) => {
   const subject = 'Booking Cancelled - HM (TEST)';
 
   const htmlContent = `
@@ -183,14 +182,4 @@ const sendBookingCancellationEmail = async (recipientEmail, bookingDetails) => {
   const textContent = `TEST: Booking ${bookingDetails.bookingId || 'N/A'} cancelled.`;
 
   return sendEmail(recipientEmail, subject, htmlContent, textContent);
-};
-
-module.exports = {
-  sendOtpEmail,
-  sendBookingConfirmationEmail,
-  sendPasswordResetEmail,         // ready to call when needed
-  sendBookingCancellationEmail,   // ready to call when needed
-  generateOtp,
-  getOtpExpiry,
-  EmailDeliveryError
 };

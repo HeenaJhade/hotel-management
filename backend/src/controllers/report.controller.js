@@ -1,8 +1,8 @@
-const Room = require('../models/Room');
-const Booking = require('../models/Booking');
-const User = require('../models/User');
+import Room from '../models/Room.js';
+import Booking from '../models/Booking.js';
+import User from '../models/User.js';
 
-const getDashboardStats = async (req, res) => {
+export const getDashboardStats = async (req, res) => {
   try {
     // Room statistics
     const totalRooms = await Room.countDocuments({});
@@ -50,8 +50,4 @@ const getDashboardStats = async (req, res) => {
     console.error('Get dashboard stats error:', error);
     res.status(500).json({ detail: 'Failed to get dashboard stats' });
   }
-};
-
-module.exports = {
-  getDashboardStats
 };

@@ -1,7 +1,6 @@
-const express = require('express');
-const router = express.Router();
-const { checkAvailability } = require("../controllers/room.controller");
-const {
+import express from 'express';
+import { checkAvailability } from "../controllers/room.controller.js";
+import {
   createRoom,
   getAllRooms,
   getRoomById,
@@ -9,13 +8,13 @@ const {
   deleteRoom,
   updateRoomStatus,
   getAvailableRooms,
-} = require('../controllers/room.controller');
-
-const {
+} from '../controllers/room.controller.js';
+import{
   authMiddleware,
   requireStaffOrAdmin,
   requireAdmin
-} = require('../middleware/auth.middleware');
+} from '../middleware/auth.middleware.js';
+const  router = express.Router();
 
 // ✅ ORDER MATTERS — specific routes first
 
@@ -31,4 +30,4 @@ router.put('/:roomId/status', authMiddleware, requireStaffOrAdmin, updateRoomSta
 router.put('/:roomId', authMiddleware, requireAdmin, updateRoom);
 router.delete('/:roomId', authMiddleware, requireAdmin, deleteRoom);
 
-module.exports = router;
+export default router;

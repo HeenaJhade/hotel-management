@@ -1,8 +1,7 @@
-require('dotenv').config();
-const mongoose = require('mongoose');
-const User = require('./src/models/User');
-const { hashPassword } = require('./src/middleware/auth.middleware');
-const connectDB = require('./src/config/db');
+import 'dotenv/config';
+import User from './src/models/User';
+import { hashPassword } from './src/middleware/auth.middleware';
+import connectDB from './src/config/db';
 
 const seedAdmin = async () => {
   await connectDB();  // only this

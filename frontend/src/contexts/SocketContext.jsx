@@ -11,7 +11,7 @@ export const SocketProvider = ({ children }) => {
   useEffect(() => {
     if (!user?.id) return;
 
-    const socketInstance = io(process.env.REACT_APP_API_URL || 'http://localhost:8001', {
+    const socketInstance = io(import.meta.env.VITE_BACKEND_URL, {
       withCredentials: true,
       reconnection: true,
       reconnectionAttempts: 5,
