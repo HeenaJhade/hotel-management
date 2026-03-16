@@ -52,19 +52,19 @@ app.use(express.urlencoded({ extended: true }));
 const seedAdmin = async () => {
   try {
 
-    const exists = await User.findOne({ email: "admin1@hotel.com" });
+    const exists = await User.findOne({ email: "admin11@hotel.com" });
 
     if (exists) {
       return;
     }
 
-    const passwordHash = await hashPassword("Admin@2005");
+    const passwordHash = await hashPassword("Admin@21234");
 
     await User.create({
-      name: "Admin User",
-      email: "admin1@hotel.com",
+      name: "Admin",
+      email: "admin11@hotel.com",
       passwordHash,
-      phone: "+916261295530",
+      phone: "+911234567891",
       role: "admin",
       isVerified: true
     });

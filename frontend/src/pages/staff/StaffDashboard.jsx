@@ -168,7 +168,7 @@ if (loading || !stats) {
                 <div className="p-3">
                   <div>
                     <p className="text-sm text-slate-600">New Bookings</p>
-                    <p className="text-2xl font-bold mt-1">{stats.newBookings}</p>
+                    <p className="text-2xl font-bold mt-1">{stats.totalBookings}</p>
                   </div>
                   <div className={`flex items-center gap-1 mt-7 text-sm font-medium ${stats.newBookingsChange > 0 ? 'text-green-600' : 'text-red-600'}`}>
                     {stats.newBookingsChange > 0 ? <TrendingUp className="h-4 w-4" /> : <TrendingDown className="h-4 w-4" />}
