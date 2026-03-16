@@ -1,60 +1,43 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from "react";
 import { XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
 import { TrendingUp, TrendingDown, MoreHorizontal } from 'lucide-react';
+import apiClient from '../../utils/api';
 
-// ────────────────────────────────────────────────
-// Mock Data (replace with real API data later)
-// ────────────────────────────────────────────────
-const mockStats = {
-  newBookings: 840,
-  newBookingsChange: 8.70,
-  checkIns: 231,
-  checkInsChange: 3.56,
-  checkOuts: 124,
-  checkOutsChange: -1.06,
-  totalRevenue: 315060,
-  revenueChange: 5.70,
-  occupancyRate: 78,
-  occupancyChange: 4.2,
-  occupied: 286,
-  reserved: 87,
-  available: 32,
-  notReady: 13,
-  overallRating: 4.6,
-  ratingCounts: { facilities: 4.4, cleanliness: 4.7, services: 4.6, comfort: 4.8, location: 4.5 },
-};
 
-const mockRevenueData = [
-  { month: 'Dec', revenue: 200000 },
-  { month: 'Jan', revenue: 250000 },
-  { month: 'Feb', revenue: 300000 },
-  { month: 'Mar', revenue: 280000 },
-  { month: 'Apr', revenue: 320000 },
-  { month: 'May', revenue: 315060 },
-];
-
-const mockBookingTrends = [
-  { month: 'Dec', bookings: 620 },
-  { month: 'Jan', bookings: 780 },
-  { month: 'Feb', bookings: 920 },
-  { month: 'Mar', bookings: 850 },
-  { month: 'Apr', bookings: 980 },
-  { month: 'May', bookings: 840 },
-];
-
-const mockTasks = [
-  { id: 1, title: 'Set Up Conference Room B for 10 AM Meeting', completed: false },
-  { id: 2, title: 'Restock Housekeeping Supplies on 3rd Floor', completed: false },
-  { id: 3, title: 'Inspect and Clean the Pool Area', completed: true },
-];
 
 export default function AdminDashboard() {
-  const [stats] = useState(mockStats);
-  const [revenueTrends] = useState(mockRevenueData);
-  const [bookingTrends] = useState(mockBookingTrends);
+  const [stats, setStats] = useState(null);
+const [todayCheckIns, setTodayCheckIns] = useState([]);
+const [todayCheckOuts, setTodayCheckOuts] = useState([]);
+const [recentBookings, setRecentBookings] = useState([]);
+const [loading, setLoading] = useState(true);
+  const [revenueTrends, setRevenueTrends] = useState([]);
 
-  const total = stats.occupied + stats.reserved + stats.available + stats.notReady;
+  useEffect(() => {
+  fetchDashboard();
+}, []);
 
+const fetchDashboard = async () => {
+  try {
+    const res = await apiClient.get("/reports/dashboard");
+    const data = res.data;
+    console.log("data",data);
+    setRevenueTrends(data.revenueTrends);
+    setStats(data.stats);
+    setTodayCheckIns(data.todayCheckIns);
+    setTodayCheckOuts(data.todayCheckOuts);
+    setRecentBookings(data.recentBookings);
+
+    setLoading(false);
+  } catch (error) {
+    console.error("Dashboard error:", error);
+  }
+};
+if (loading || !stats) {
+  return <div className="p-10 text-center">Loading Dashboard...</div>;
+}
+
+const total = stats.occupied + stats.reserved + stats.available + stats.notReady;
   return (
     <>
       <div className="p-1 space-y-8 bg-slate-50">
@@ -70,7 +53,7 @@ export default function AdminDashboard() {
               <div className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow">
                 <div className="p-3">
                   <p className="text-sm text-slate-600">New Bookings</p>
-                  <p className="text-2xl font-bold mt-1">{stats.newBookings}</p>
+                  <p className="text-2xl font-bold mt-1">{stats.totalBookings}</p>
                   <div className={`flex items-center gap-1 mt-7 text-sm font-medium ${stats.newBookingsChange > 0 ? 'text-green-600' : 'text-red-600'}`}>
                     {stats.newBookingsChange > 0 ? <TrendingUp className="h-4 w-4" /> : <TrendingDown className="h-4 w-4" />}
                     {stats.newBookingsChange}%
@@ -190,10 +173,6 @@ export default function AdminDashboard() {
                 <div className="md:col-span-2 bg-white rounded-xl shadow-sm">
                   <div className="p-6 pb-2 flex flex-row items-center justify-between">
                     <h3 className="text-lg font-semibold">Revenue Trend</h3>
-                    <select className="text-sm border rounded px-3 py-1 bg-white">
-                      <option>Last 6 Months</option>
-                      <option>Last 12 Months</option>
-                    </select>
                   </div>
                   <div className="px-6 pb-6">
                     <ResponsiveContainer width="100%" height={300}>
@@ -209,29 +188,7 @@ export default function AdminDashboard() {
                 </div>
               </div>
 
-              {/* Row 2: Booking Trends */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="md:col-span-2 bg-white rounded-xl shadow-sm">
-                  <div className="p-6 pb-2 flex flex-row items-center justify-between">
-                    <h3 className="text-lg font-semibold">Booking Trends</h3>
-                    <select className="text-sm border rounded px-3 py-1 bg-white">
-                      <option>Last 6 Months</option>
-                      <option>Last 12 Months</option>
-                    </select>
-                  </div>
-                  <div className="px-6 pb-6">
-                    <ResponsiveContainer width="100%" height={300}>
-                      <LineChart data={mockBookingTrends}>
-                        <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                        <XAxis dataKey="month" stroke="#64748b" fontSize={12} />
-                        <YAxis stroke="#64748b" fontSize={12} />
-                        <Tooltip contentStyle={{ backgroundColor: 'white', border: '1px solid #e2e8f0', borderRadius: '8px' }} />
-                        <Line type="monotone" dataKey="bookings" stroke="#8b5cf6" strokeWidth={3} dot={false} />
-                      </LineChart>
-                    </ResponsiveContainer>
-                  </div>
-                </div>
-              </div>
+        
             </div>
           </div>
 
@@ -265,32 +222,6 @@ export default function AdminDashboard() {
               </div>
             </div>
 
-            {/* Tasks */}
-            <div className="bg-white rounded-xl shadow-sm">
-              <div className="p-6 pb-2 flex flex-row items-center justify-between">
-                <h3 className="text-lg font-semibold">Tasks</h3>
-                <button className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium border border-slate-300 rounded-md hover:bg-slate-50 transition-colors">
-                  <span>+</span> Add Task
-                </button>
-              </div>
-              <div className="px-6 pb-6">
-                <div className="space-y-3">
-                  {mockTasks.map((task) => (
-                    <div key={task.id} className="flex items-start gap-3 p-3 rounded-lg hover:bg-slate-50 transition-colors">
-                      <input type="checkbox" checked={task.completed} readOnly className="mt-1" />
-                      <div className="flex-1">
-                        <p className={`text-sm ${task.completed ? 'line-through text-slate-500' : 'text-slate-900'}`}>
-                          {task.title}
-                        </p>
-                      </div>
-                      <button className="h-8 w-8 flex items-center justify-center rounded hover:bg-slate-100 transition-colors">
-                        <MoreHorizontal className="h-4 w-4" />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
 
           </div>
         </div>

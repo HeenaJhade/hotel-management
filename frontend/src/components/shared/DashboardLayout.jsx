@@ -2,7 +2,6 @@ import { Link, useLocation, useNavigate, Outlet } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { Hotel, Home, Bed, Calendar, User, Bell, Settings, LogOut } from 'lucide-react';
 import { toast } from 'sonner';
-import NotificationBell from './NotificationBell';
 import { useState, useRef, useEffect } from 'react';
 
 export default function DashboardLayout({ children, role }) {
@@ -118,7 +117,7 @@ export default function DashboardLayout({ children, role }) {
 
               <div className="flex items-center gap-4">
 
-                <NotificationBell />
+             
 
                 {/* Profile Dropdown */}
                 <div className="relative" ref={menuRef}>
@@ -136,13 +135,7 @@ export default function DashboardLayout({ children, role }) {
                   {openMenu && (
                     <div className="absolute right-0 mt-2 w-48 bg-white border border-slate-200 rounded-md shadow-lg">
 
-                      <button
-                        data-testid="settings-menu-item"
-                        className="flex items-center w-full px-4 py-2 text-sm hover:bg-slate-100"
-                      >
-                        <Settings className="w-4 h-4 mr-2" />
-                        Settings
-                      </button>
+
 
                       <button
                         data-testid="logout-menu-item"

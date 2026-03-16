@@ -1,5 +1,6 @@
 import express from "express";
 const router = express.Router();
+import {imagekit} from "../config/imagekit.js";
 
 router.post("/upload", async (req, res) => {
   try {

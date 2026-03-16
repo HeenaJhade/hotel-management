@@ -8,7 +8,6 @@ import {
   getDashboardStats,
   checkIn,
   checkOut,
-  createBooking,
   createBookingAfterPayment,
 } from '../controllers/booking.controller.js';
 

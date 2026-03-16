@@ -5,13 +5,12 @@ import { sendOtpEmail, generateOtp, getOtpExpiry }  from '../services/email.serv
 
 export const signup = async (req, res) => {
   const errors = validationResult(req);
-  console.log(errors);
+
   if (!errors.isEmpty()) {
     return res.status(400).json({ detail: 'Invalid input data' });
   }
 
   const { name, email, password, phone, role = 'user' } = req.body;
-  console.log("body",req.body);
   try {
     if (await User.findOne({ email })) {
       return res.status(400).json({ detail: 'Email already registered' });

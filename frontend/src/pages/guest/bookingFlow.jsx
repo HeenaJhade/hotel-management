@@ -10,7 +10,7 @@ import { Elements } from "@stripe/react-stripe-js";
 import { CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
 
 const stripePromise = loadStripe("pk_test_51T7aZMFoKSbSrKPM4XHA2GyPqFBU5uzPoyT0V6ynkcYSacnptoIzQYqva77HESgp4QXNHPTySIcVmY2aa7oP11Ez00HMWL8LnC");
-export default function BookingFlow (){
+ function BookingFlow (){
   const [paymentIntentId, setPaymentIntentId] = useState(null);
   const stripe = useStripe();
   const elements = useElements();

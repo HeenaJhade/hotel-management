@@ -47,7 +47,7 @@ export const markNotificationRead = async (req, res) => {
     if (!user) return res.status(401).json({ detail: 'Unauthorized' });
 
     const notificationId = req.params.notificationId;
-    console.log("markread called", notificationId);
+   
 
     const updated = await Notification.findOneAndUpdate(
       { _id: notificationId, userId: user.id },
@@ -94,7 +94,7 @@ export const deleteNotification = async (req, res) => {
     if (!user) {
       return res.status(401).json({ detail: 'Authentication required' });
     }
-     console.log("deletenotificatincalled",req.params.notificationId);
+ 
     const result = await Notification.deleteOne({
       _id: req.params.notificationId,
       userId: user.id,

@@ -32,9 +32,11 @@ export const createRoom = async (req, res) => {
       price: Number(price),
       description: description?.trim() || "",
       capacity: Number(capacity),
-      amenities: amenities
-        ? amenities.split(",").map((a) => a.trim()).filter(Boolean)
-        : [],
+      amenities: Array.isArray(amenities)
+  ? amenities
+  : amenities
+    ? amenities.split(",").map((a) => a.trim()).filter(Boolean)
+    : [],
       imageUrl: imageUrl || null,
       status: "available",
     });

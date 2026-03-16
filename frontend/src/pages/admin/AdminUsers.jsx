@@ -133,7 +133,7 @@ export default function AdminUsers() {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h2 className="text-3xl font-bold text-slate-900">
-            Users Management
+            Staff Management
           </h2>
           <p className="text-slate-600 mt-1">
             {loading ? "Loading..." : `${total} users found`}

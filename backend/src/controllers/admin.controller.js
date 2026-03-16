@@ -36,7 +36,10 @@ export const createStaff = async (req, res) => {
     res.json({ message: 'Staff account created. OTP sent for verification.', email });
   } catch (error) {
     console.error('Create staff error:', error);
-    res.status(500).json({ detail: 'Failed to create staff' });
+    res.status(500).json({
+  detail: "Failed to create room",
+  error: error.message
+});
   }
 };
 

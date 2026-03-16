@@ -9,7 +9,7 @@ Ban,
 Trash2,
 Search,
 } from "lucide-react";
-import "../../App.css";
+
 
 const ITEMS_PER_PAGE = 10;
 

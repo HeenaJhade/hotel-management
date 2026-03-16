@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import apiClient from "../../utils/api";
 import { Search } from "lucide-react";
-import "../../App.css";
+
 
 const ITEMS_PER_PAGE = 10;
 

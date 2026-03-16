@@ -61,7 +61,7 @@ export const Home = () => {
   }, [location]);
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen ">
       {/* Hero Section */}
       <section id="home" className="relative h-screen flex items-center justify-center overflow-hidden pt-16">
         <div className="absolute inset-0">
@@ -88,7 +88,7 @@ export const Home = () => {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <button
-                onClick={() => navigate('/rooms')}
+                onClick={() => navigate('/user/rooms')}
                 className="px-8 py-6 text-base font-medium bg-[#C6A87C] hover:bg-[#B09265] text-white rounded-lg transition-colors shadow-sm"
                 data-testid="hero-book-button"
               >
@@ -150,7 +150,7 @@ export const Home = () => {
                       <span className="text-sm text-slate-600">/night</span>
                     </div>
                     <button
-                      onClick={() => navigate('/rooms')}
+                      onClick={() => navigate('/user/rooms')}
                       className="px-4 py-2 text-sm font-medium bg-slate-900 hover:bg-slate-800 text-white rounded-lg transition-colors"
                     >
                       Book Now

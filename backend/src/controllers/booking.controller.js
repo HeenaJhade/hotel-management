@@ -92,126 +92,7 @@ export const createBookingAfterPayment = async (req, res) => {
     res.status(500).json({ message: "Failed to create booking" });
   }
 };
-export const createBooking = async (req, res) => {
-  const { roomId, checkIn, checkOut, guests, specialRequests = "" } = req.body;
 
-  try {
-    const user = await getUserFromToken(req);
-    if (!user) {
-      return res.status(401).json({ detail: "Authentication required" });
-    }
-
-    // Find the room by _id (assuming roomId is MongoDB _id)
-    const room = await Room.findById(roomId);
-    console.log("User:", user, "Room:", room);
-
-    if (!room) {
-      return res.status(404).json({ detail: 'Room not found' });
-    }
-
-    // Validate dates
-    const checkInDate  = new Date(checkIn);
-    const checkOutDate = new Date(checkOut);
-
-    if (isNaN(checkInDate.getTime()) || isNaN(checkOutDate.getTime())) {
-      return res.status(400).json({ detail: "Invalid date format" });
-    }
-
-    if (checkOutDate <= checkInDate) {
-      return res.status(400).json({ detail: "Check-out must be after check-in" });
-    }
-
-    // Check for overlapping bookings for this specific room
-    const overlapping = await Booking.findOne({
-      roomId: room._id,
-      $or: [
-        // Any booking that starts before requested check-out AND ends after requested check-in
-        { checkIn: { $lt: checkOutDate }, checkOut: { $gte: checkInDate } },
-      ],
-    });
-
-    if (overlapping) {
-      return res.status(409).json({
-        detail: "Room is already booked for the selected dates",
-        conflictingBookingId: overlapping.bookingId,
-      });
-    }
-
-    // Calculate nights and total
-    const nights = Math.ceil((checkOutDate - checkInDate) / (1000 * 60 * 60 * 24));
-    const totalAmount = room.price * nights;
-
-    const bookingId = `BK${Date.now().toString().slice(-8)}${Math.floor(Math.random() * 1000)}`;
-
-    const booking = new Booking({
-      bookingId,
-      paymentIntentId: req.body.paymentIntentId || null,
-      userId:      user.id,
-      userEmail:   user.email,
-      userName:    user.name,
-      roomId:      room._id,           // store ObjectId
-      roomNumber:  room.roomNumber,
-      roomType:    room.roomType,
-      checkIn:     checkInDate,
-      checkOut:    checkOutDate,
-      guests:      Number(guests),
-      nights,
-      totalAmount,
-      status:      'confirmed',
-      paymentStatus: 'paid',        // or 'paid' if mock payment succeeds
-      specialRequests,
-    });
-    
-    await booking.save();
-    // Create notification
-    const notification = new Notification({
-      id: `NT${Date.now()}`,
-      userId: user.id,
-      message: `Booking confirmed for ${room.roomType} - Room ${room.roomNumber}`,
-      type: 'booking',
-      isRead: false,
-    });
-await notification.save();
-
-//After saving notification
-await notification.save();
-
-//Emit real-time event
-const io = req.app.get('io'); // or your io instance
-io.to(`user_${user.id}`).emit('newNotification', {
-  _id: notification._id,
-  message: notification.message,
-  type: notification.type,
-  isRead: notification.isRead,
-  createdAt: notification.createdAt
-});
-
-console.log(`Emitted newNotification to user_${user.id}`);
-
-    // Send email (with error handling)
-    try {
-      await sendBookingConfirmationEmail(user.email, {
-        guestName: user.name,
-        bookingId,
-        roomType: room.roomType,
-        roomNumber: room.roomNumber,
-        checkIn: checkInDate,
-        checkOut: checkOutDate,
-        totalAmount,
-      });
-    } catch (emailErr) {
-      console.error('Booking email failed:', emailErr);
-    }
-
-    res.status(201).json({
-      message: 'Booking created successfully',
-      booking,
-    });
-  } catch (error) {
-    console.error('Create booking error:', error);
-    res.status(500).json({ detail: 'Failed to create booking' });
-  }
-};
 
 export const getBookings = async (req, res) => {
   try {
@@ -256,13 +137,11 @@ export const getBookings = async (req, res) => {
 export const getUserBookings = async (req, res) => {
   try {
     const user = await getUserFromToken(req);
-    console.log(user);
     if (!user) return res.status(401).json({ detail: "Please login" });
 
     const bookings = await Booking.find({ userId: user.id })
       .sort({ createdAt: -1 })
       .lean();
-    console.log({bookings});
     res.json({ bookings });
 
   } catch (err) {
@@ -406,8 +285,7 @@ const todayUTC = new Date(Date.UTC(
 const tomorrowUTC = new Date(todayUTC);
 tomorrowUTC.setUTCDate(tomorrowUTC.getUTCDate() + 1);
 
-console.log("Today UTC:", todayUTC);
-console.log("Tomorrow UTC:", tomorrowUTC);
+
 
     const totalRooms = await Room.countDocuments();
 

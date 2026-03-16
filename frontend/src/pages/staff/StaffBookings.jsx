@@ -2,7 +2,7 @@ import React, { useEffect, useState, useMemo } from "react";
 import apiClient from "../../utils/api";
 import { toast } from "sonner";
 import { Calendar, Eye, X, User, Bed, CreditCard, Search } from "lucide-react";
-import "../../App.css";
+
 
 const ITEMS_PER_PAGE = 10;
 

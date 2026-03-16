@@ -35,10 +35,6 @@ import "./index.css";
 // ────────────────────────────────────────────────
 const ProtectedRoute = ({ children, allowedRoles }) => {
   const { user, loading } = useAuth();
-  console.log("ProtectedRoute check →", {
-  currentRole: user?.role,
-  allowedRoles,
-});
 
   if (loading) {
     return (
@@ -125,7 +121,6 @@ function AppRoutes() {
   <Route path="bookings" element={<AdminBookings />} />
   <Route path="users" element={<AdminUsers />} />
   <Route path="staff" element={<AdminStaff />} />
-  <Route path="notifications" element={<Notifications />} />
 </Route>
 
 
@@ -141,7 +136,6 @@ function AppRoutes() {
   <Route path="rooms" element={<StaffRoomStatus />} />
   <Route path="bookings" element={<StaffBookings />} />
   <Route path="guest-management" element={<StaffGuestManagement />} />
-  <Route path="notifications" element={<Notifications />} />
 </Route>
 
 

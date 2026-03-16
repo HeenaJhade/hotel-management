@@ -10,69 +10,20 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import apiClient from '../../utils/api';
-import '../../App.css';
 
-const mockStats = {
-  newBookings: 840,
-  newBookingsChange: 8.70,
-  checkIns: 231,
-  checkInsChange: 3.56,
-  checkOuts: 124,
-  checkOutsChange: -1.06,
-  totalRevenue: 315060,
-  revenueChange: 5.70,
-  occupancyRate: 78,
-  occupancyChange: 4.2,
-  occupied: 286,
-  reserved: 87,
-  available: 32,
-  notReady: 13,
-  overallRating: 4.6,
-  ratingCounts: { facilities: 4.4, cleanliness: 4.7, services: 4.6, comfort: 4.8, location: 4.5 },
-};
 
-const mockRevenueData = [
-  { month: 'Dec', revenue: 200000 },
-  { month: 'Jan', revenue: 250000 },
-  { month: 'Feb', revenue: 300000 },
-  { month: 'Mar', revenue: 280000 },
-  { month: 'Apr', revenue: 320000 },
-  { month: 'May', revenue: 315060 },
-];
-
-const mockBookingTrends = [
-  { month: 'Dec', bookings: 620 },
-  { month: 'Jan', bookings: 780 },
-  { month: 'Feb', bookings: 920 },
-  { month: 'Mar', bookings: 850 },
-  { month: 'Apr', bookings: 980 },
-  { month: 'May', bookings: 840 },
-];
-
-const mockBookingPlatforms = [
-  { name: 'Direct Booking', value: 61 },
-  { name: 'Booking.com', value: 12 },
-  { name: 'Others', value: 27 },
-];
-
-const mockTasks = [
-  { id: 1, title: 'Set Up Conference Room B for 10 AM Meeting', completed: false },
-  { id: 2, title: 'Restock Housekeeping Supplies on 3rd Floor', completed: false },
-  { id: 3, title: 'Inspect and Clean the Pool Area', completed: true },
-];
 
 const COLORS = ['#0ea5e9', '#f59e0b', '#64748b'];
 
 export default function Dashboard() {
-  const [stats, setStats] = useState(mockStats);
+  const [stats, setStats] = useState(null);
   const [todayCheckIns, setTodayCheckIns] = useState([]);
   const [todayCheckOuts, setTodayCheckOuts] = useState([]);
   const [recentBookings, setRecentBookings] = useState([]);
   const [checkInSearch, setCheckInSearch] = useState('');
   const [checkOutSearch, setCheckOutSearch] = useState('');
-  const [revenueTrends] = useState(mockRevenueData);
-  const [bookingTrends] = useState(mockBookingTrends);
-  const [loading, setLoading] = useState(false);
+ const [revenueTrends, setRevenueTrends] = useState([]);
+const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   const filteredCheckIns = todayCheckIns.filter(
@@ -87,27 +38,35 @@ export default function Dashboard() {
       booking.bookingId?.toLowerCase().includes(checkOutSearch.toLowerCase())
   );
 
-  useEffect(() => {
-    fetchDashboardData();
-  }, []);
+    useEffect(() => {
+  fetchDashboard();
+}, []);
 
-  const fetchDashboardData = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const response = await apiClient.get('/bookings/stats');
-      console.log('Dashboard API response:', response.data);
-      setTodayCheckIns(response.data.todayCheckIns || []);
-      setTodayCheckOuts(response.data.todayCheckOuts || []);
-      setRecentBookings(response.data.recentBookings || []);
-      setLoading(false);
-    } catch (err) {
-      console.error('Dashboard fetch error:', err);
-      setError(err.response?.data?.detail || 'Failed to load dashboard data');
-      toast.error('Failed to load dashboard');
-      setLoading(false);
-    }
-  };
+const fetchDashboard = async () => {
+  try {
+    setLoading(true);
+
+    const res = await apiClient.get("/reports/dashboard");
+    const data = res.data;
+
+    console.log("Dashboard data:", data);
+
+    setStats(data.stats);
+    setRevenueTrends(data.revenueTrends || []);
+    setTodayCheckIns(data.todayCheckIns || []);
+    setTodayCheckOuts(data.todayCheckOuts || []);
+    setRecentBookings(data.recentBookings || []);
+
+  } catch (error) {
+    console.error("Dashboard error:", error);
+    setError("Failed to load dashboard");
+  } finally {
+    setLoading(false);
+  }
+};
+if (loading || !stats) {
+  return <div className="p-10 text-center">Loading Dashboard...</div>;
+}
 
   const handleCheckIn = async (bookingId, roomId) => {
     if (!window.confirm('Mark this guest as checked-in?')) return;
@@ -342,10 +301,7 @@ export default function Dashboard() {
                 <div className="md:col-span-2 bg-white rounded-xl shadow-sm">
                   <div className="p-6 pb-2 flex flex-row items-center justify-between">
                     <h3 className="text-lg font-semibold">Revenue Trend</h3>
-                    <select className="text-sm border rounded px-3 py-1 bg-white">
-                      <option>Last 6 Months</option>
-                      <option>Last 12 Months</option>
-                    </select>
+
                   </div>
                   <div className="px-6 pb-6">
                     <ResponsiveContainer width="100%" height={300}>
@@ -361,29 +317,6 @@ export default function Dashboard() {
                 </div>
               </div>
 
-              {/* Row 2: Booking Trends */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="md:col-span-2 bg-white rounded-xl shadow-sm">
-                  <div className="p-6 pb-2 flex flex-row items-center justify-between">
-                    <h3 className="text-lg font-semibold">Booking Trends</h3>
-                    <select className="text-sm border rounded px-3 py-1 bg-white">
-                      <option>Last 6 Months</option>
-                      <option>Last 12 Months</option>
-                    </select>
-                  </div>
-                  <div className="px-6 pb-6">
-                    <ResponsiveContainer width="100%" height={300}>
-                      <LineChart data={mockBookingTrends}>
-                        <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                        <XAxis dataKey="month" stroke="#64748b" fontSize={12} />
-                        <YAxis stroke="#64748b" fontSize={12} />
-                        <Tooltip contentStyle={{ backgroundColor: 'white', border: '1px solid #e2e8f0', borderRadius: '8px' }} />
-                        <Line type="monotone" dataKey="bookings" stroke="#8b5cf6" strokeWidth={3} dot={false} />
-                      </LineChart>
-                    </ResponsiveContainer>
-                  </div>
-                </div>
-              </div>
             </div>
           </div>
 
@@ -428,32 +361,7 @@ export default function Dashboard() {
               </div>
             </div>
 
-            {/* Tasks */}
-            <div className="bg-white rounded-xl shadow-sm">
-              <div className="p-6 pb-2 flex flex-row items-center justify-between">
-                <h3 className="text-lg font-semibold">Tasks</h3>
-                <button className="px-3 py-1.5 text-xs border border-slate-300 rounded-md font-medium text-slate-700 hover:bg-slate-50 transition-colors flex items-center gap-1">
-                  <span>+</span> Add Task
-                </button>
-              </div>
-              <div className="px-6 pb-6">
-                <div className="space-y-3">
-                  {mockTasks.map((task) => (
-                    <div key={task.id} className="flex items-start gap-3 p-3 rounded-lg hover:bg-slate-50 transition-colors">
-                      <input type="checkbox" checked={task.completed} readOnly className="mt-1" />
-                      <div className="flex-1">
-                        <p className={`text-sm ${task.completed ? 'line-through text-slate-500' : 'text-slate-900'}`}>
-                          {task.title}
-                        </p>
-                      </div>
-                      <button className="h-8 w-8 flex items-center justify-center rounded hover:bg-slate-100 transition-colors">
-                        <MoreHorizontal className="h-4 w-4" />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
+            
           </div>
         </div>
       </div>

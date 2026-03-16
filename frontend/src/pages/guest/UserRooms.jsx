@@ -10,7 +10,6 @@ export default function UserRooms() {
   const [filter, setFilter] = useState("all");
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
-
   const [checkInFilter, setCheckInFilter] = useState("");
   const [checkOutFilter, setCheckOutFilter] = useState("");
 
