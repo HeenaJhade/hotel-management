@@ -39,9 +39,9 @@ app.use(cors({
 }));
 
 
-// 2️⃣ All other routes use normal body parsers
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use("/api", uploadRoutes);
+app.use(express.json({ limit: "10mb" }));
+app.use(express.urlencoded({ limit: "10mb", extended: true }));
 
 
 // ────────────────────────────────────────────────

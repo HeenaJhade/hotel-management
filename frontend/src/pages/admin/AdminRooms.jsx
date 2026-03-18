@@ -117,25 +117,22 @@ export default function AdminRooms() {
       let imageUrl = editingRoom?.imageUrl || null;
 
       if (selectedFile) {
-        const reader = new FileReader();
+    // ✅ Create FormData properly
+    const uploadData = new FormData();
+    uploadData.append("file", selectedFile);
 
-        const base64 = await new Promise((resolve, reject) => {
-          reader.onload = () => resolve(reader.result.split(',')[1]);
-          reader.onerror = reject;
-          reader.readAsDataURL(selectedFile);
-        });
+    const uploadRes = await apiClient.post("/upload", uploadData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
 
-        const uploadRes = await apiClient.post('/upload', {
-          file: base64,
-          fileName: selectedFile.name,
-        });
+    if (!uploadRes.data.success) {
+      throw new Error("Image upload failed");
+    }
 
-        if (!uploadRes.data.success) {
-          throw new Error('Image upload failed');
-        }
-
-        imageUrl = uploadRes.data.url;
-      }
+    imageUrl = uploadRes.data.url;
+  }
 
       const payload = {
         roomNumber: formData.room_number.trim(),
