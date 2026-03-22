@@ -1,20 +1,33 @@
 import { useEffect, useState } from "react";
 import apiClient from "../../utils/api";
 import { toast } from "sonner";
-import { Calendar, DollarSign } from "lucide-react";
+import { Calendar} from "lucide-react";
+import { generateBillingSlip } from "../../utils/pdfGenerator";
+import { useAuth } from '../../contexts/AuthContext';
 
 export default function UserBookings() {
+   const [rooms, setRooms] = useState([]);
   const [bookings, setBookings] = useState([]);
+    const { user } = useAuth();
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchBookings();
+    fetchRooms();
   }, []);
-
+const fetchRooms = async () => {
+  try {
+    const res = await apiClient.get('/rooms/all');
+    setRooms(res.data.rooms);
+  } catch (err) {
+    toast.error("Failed to load rooms");
+  }
+};
   const fetchBookings = async () => {
     try {
       const response = await apiClient.get('/bookings/userbooking');
       setBookings(response.data.bookings || []);
+      
     } catch (error) {
       toast.error("Failed to load bookings");
     } finally {
@@ -36,7 +49,20 @@ export default function UserBookings() {
         return "bg-gray-100 text-gray-700";
     }
   };
+  const handleDownloadBillingSlip = (booking,room) => {
+  if (!booking) {
+    toast.error("Cannot generate invoice - missing booking details");
+    return;
+  }
 
+  try {
+    generateBillingSlip(booking, room, user); 
+    toast.success("Billing slip downloaded successfully!");
+  } catch (error) {
+    console.error("PDF error:", error);
+    toast.error("Failed to generate billing slip. Please try again.");
+  }
+};
   const getPaymentColor = (status) => {
     switch (status) {
       case "completed":
@@ -100,6 +126,9 @@ export default function UserBookings() {
     ) : (
       <div className="space-y-10">
         {bookings.map((booking) => {
+          const room = rooms.find(
+  r => r._id?.toString() === booking.roomId?.toString()
+);
           const nights = booking.nights;
 
           return (
@@ -115,7 +144,10 @@ export default function UserBookings() {
                   {/* Image */}
                   <div className="relative w-full md:w-56 h-56 rounded-2xl overflow-hidden shadow-md">
                     <img
-                      src="https://images.unsplash.com/photo-1566665797739-1674de7a421a"
+
+                        src={room?.imageUrl || "/default-room.jpg"}
+                        
+                      
                       alt="Room"
                       className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                     />
@@ -179,7 +211,12 @@ export default function UserBookings() {
                           {booking.guests} Guest
                         </p>
                       </div>
-
+<button
+  onClick={() => handleDownloadBillingSlip(booking,room)}
+  className="flex-1 border border-stone-300 hover:bg-stone-50 text-stone-700 py-5 px-6 rounded-full font-medium transition-colors"
+>
+  Download Billing Slip
+</button>
                     </div>
 
                     {booking.specialRequests && (

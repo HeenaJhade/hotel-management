@@ -443,7 +443,7 @@ const stripePromise = loadStripe("pk_test_51T7aZMFoKSbSrKPM4XHA2GyPqFBU5uzPoyT0V
             <div className="space-y-6">
               <div className="flex gap-4">
                 <img
-                  src={room.imageUrl || 'https://images.unsplash.com/photo-1759264244764-2cb80f1a67bd?w=400'}
+                  src={room.imageUrl }
                   alt={room.roomNumber}
                   className="w-20 h-20 rounded-lg object-cover"
                 />

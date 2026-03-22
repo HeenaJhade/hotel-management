@@ -78,18 +78,19 @@ export const generateBillingSlip = (booking, room, user = {}) => {
     doc.setFontSize(11);
     doc.setFont('helvetica', 'normal');
 
-    const pricePerNight = safeStr(room?.price || booking?.pricePerNight || 0);
-    const total = safeStr(booking?.totalAmount || booking?.total_price || 0);
+    const pricePerNight = Number(room?.price || booking?.pricePerNight || 0);
+const total = Number(booking?.totalAmount || booking?.total_price || 0);
 
-    doc.text(`Price per night: ₹${pricePerNight}`, 20, y);
-    y += 8;
-    doc.text(`Nights: ${booking?.nights || '—'}`, 20, y);
-    y += 8;
+doc.text(`Price per night: Rs. ${pricePerNight.toLocaleString('en-IN')}`, 20, y);
+y += 8;
 
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(13);
-    doc.text('Total Amount:', 20, y);
-    doc.text(`₹${total}`, 105, y, { align: 'right' });
+doc.text(`Nights: ${booking?.nights || '—'}`, 20, y);
+y += 8;
+
+doc.setFont('helvetica', 'bold');
+doc.setFontSize(13);
+doc.text('Total Amount: Rs.', 20, y);
+doc.text(`${total.toLocaleString('en-IN')}`, 105, y, { align: 'right' });
 
     // Payment status badge
     const status = (booking?.paymentStatus || booking?.payment_status || 'pending').toUpperCase();

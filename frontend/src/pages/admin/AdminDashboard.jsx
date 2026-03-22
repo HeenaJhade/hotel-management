@@ -16,7 +16,8 @@ const [loading, setLoading] = useState(true);
   useEffect(() => {
   fetchDashboard();
 }, []);
-
+const formatCurrency = (amount) =>
+  new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(amount || 0);
 const fetchDashboard = async () => {
   try {
     const res = await apiClient.get("/reports/dashboard");
@@ -108,7 +109,9 @@ const total = stats.occupied + stats.reserved + stats.available + stats.notReady
               <div className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow">
                 <div className="p-3">
                   <p className="text-sm text-slate-600">Total Revenue</p>
-                  <p className="text-2xl font-bold mt-1">${stats.totalRevenue.toLocaleString()}</p>
+                  <p className="text-2xl font-bold mt-1">
+  {formatCurrency(stats.totalRevenue)}
+</p>
                   <div className={`flex items-center gap-1 mt-7 text-sm font-medium ${stats.revenueChange > 0 ? 'text-green-600' : 'text-red-600'}`}>
                     {stats.revenueChange > 0 ? <TrendingUp className="h-4 w-4" /> : <TrendingDown className="h-4 w-4" />}
                     {stats.revenueChange}%

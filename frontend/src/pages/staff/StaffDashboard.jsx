@@ -4,7 +4,7 @@ import {
   LineChart, Line,
 } from 'recharts';
 import {
-  TrendingUp, TrendingDown, Users, DollarSign, Bed, Search,
+  TrendingUp, TrendingDown, Users,  Bed, Search,
   CheckCircle2, Clock, MoreHorizontal, IndianRupee, Calendar,
   CheckCircle, XCircle, Hotel, Loader2,
 } from 'lucide-react';
@@ -76,6 +76,7 @@ if (loading || !stats) {
         prev.map((b) => (b._id === bookingId ? { ...b, status: 'checked_in' } : b))
       );
       toast.success('Guest checked in successfully');
+      fetchDashboard();
     } catch (error) {
       console.error('Check-in error:', error);
       toast.error('Failed to check in guest');
@@ -90,6 +91,7 @@ if (loading || !stats) {
         prev.map((b) => (b._id === bookingId ? { ...b, status: 'checked_out' } : b))
       );
       toast.success('Guest checked out successfully');
+      fetchDashboard();
     } catch (error) {
       console.error('Check-out error:', error);
       toast.error('Failed to check out guest');
@@ -97,8 +99,7 @@ if (loading || !stats) {
   };
 
   const formatCurrency = (amount) =>
-    new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(amount || 0);
-
+  new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(amount || 0);
   const formatDate = (date) =>
     date
       ? new Date(date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
@@ -232,7 +233,9 @@ if (loading || !stats) {
                 <div className="p-3">
                   <div>
                     <p className="text-sm text-slate-600">Total Revenue</p>
-                    <p className="text-2xl font-bold mt-1">${stats.totalRevenue.toLocaleString()}</p>
+                    <p className="text-2xl font-bold mt-1">
+  {formatCurrency(stats.totalRevenue)}
+</p>
                   </div>
                   <div className={`flex items-center gap-1 mt-7 text-sm font-medium ${stats.revenueChange > 0 ? 'text-green-600' : 'text-red-600'}`}>
                     {stats.revenueChange > 0 ? <TrendingUp className="h-4 w-4" /> : <TrendingDown className="h-4 w-4" />}
